@@ -6,7 +6,7 @@ const addExpense = async (req, res) => {
         const { title, amount, category } = req.body;
 
         // ملاحظة: الـ req.user.id بتيجي من الـ Auth Middleware اللي هنعمله
-        const newExpense = await Expense.create({
+        const expense = await Expense.create({
             title,
             amount,
             category,
@@ -15,8 +15,9 @@ const addExpense = async (req, res) => {
 
         res.status(201).json({
             success: true,
-            data: newExpense
+            data: Expense
         });
+        
     } catch (error) {
         res.status(400).json({
             success: false,
@@ -29,7 +30,10 @@ const addExpense = async (req, res) => {
 const getExpenses = async (req, res) => {
     try {
         // بنبحث عن المصاريف اللي الـ user ID بتاعها بيساوي ID الشخص اللي عامل login
-        const expenses = await Expense.find({ user: req.user.id }).sort({ date: -1 });
+        const expenses = await Expense.find({ user: req.user.id })
+        .populate("category", "name")
+      // sort للترتيب 
+        .sort({ date : -1 });
 
         res.status(200).json({
             success: true,
@@ -93,6 +97,29 @@ const updateExpense = async (req, res) => {
     }
 };
 
+// const getTotalExpenses = async(req, res) => {
+//     try {
+//         const result = await Expense.aggregate([
+//             {
+//                 // Take only the current user's expenses
+//                 $match : { user : req.user.id }
+//             },
+//             {
+//                 // add all amount 
+//                 $group : {
+//                     _id : null,
+//                     total : { $sum : "$amount" }
+//                 }
+//             }
+//         ]);
+//         res.status(200).json({
+//             seccess : true,
+//             total : result[0]?.total || 0
+//         });
+//     } catch (err) {
+//         res.status(500).json({ msg : err.message});
+//     }
+// }
 
-module.exports = { addExpense, getExpenses, deleteExpense, updateExpense };
+module.exports = { addExpense, getExpenses, deleteExpense, updateExpense, };
 

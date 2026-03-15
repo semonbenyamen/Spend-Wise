@@ -1,3 +1,5 @@
+// the purpose  of this Category is to allow the user to create categorize expenses 
+
 const mongoose = require("mongoose");
 
 const categorySchema = new mongoose.Schema({
@@ -7,7 +9,7 @@ const categorySchema = new mongoose.Schema({
         trim: true
     },
     user: {
-        tyoy : mongoose.Schema.Typyes.ObjectId,
+        type : mongoose.Schema.Types.ObjectId,
         ref: "User",
         reqired: true
     },

@@ -13,13 +13,13 @@ const expenseSchema = new mongoose.Schema({
         required: [true, "Please add an amount"],
         min: [1, "Amount must be at least 1"]
     },
-    // 3: التصنيف (Category)
+    // 3: ربط ال category ب objectId
     category: {
-        type: String,
-        required: [true, "Please select a category"],
-        enum: ["Food", "Transport", "Bills", "Entertainment", "Health", "Other"]
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Category",
+        required: true,
     },
-    // 4: الربط بالمستخدم (الـ Relationship اللي اتكلمنا عنها)
+    // 4: الربط ب User 
     user: {
         type: mongoose.Schema.Types.ObjectId,
         ref: "User", // لازم يكون نفس الاسم اللي في موديل الـ User

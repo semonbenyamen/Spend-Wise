@@ -3,12 +3,10 @@ const express = require("express");
 const mongoose = require('mongoose');
 
 const app = express();
-
+//middlewares
 app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
-app.use("/api/auth", require("./routes/authRoutes"));
-
-app.use("/api/expenses", require("./routes/expenseRoutes"));
 // connect database
 const connectDB = async () => {
   try {
@@ -21,6 +19,11 @@ const connectDB = async () => {
   }
 };
 connectDB();
+
+app.use("/api/auth", require("./routes/authRoutes"));
+app.use("/api/categories", require("./routes/categoryRoutes"));
+app.use("/api/expenses", require("./routes/expenseRoutes"));
+
 
 app.get("/", (req, res) => {
   res.send("API is running...");
