@@ -1,4 +1,6 @@
 const Budget = require("../Models/Budget");
+const Expense = require("../Models/Expense");
+const Exppense = require("../Models/Expense");
 
 //Setting a monthly budget
 const addBudget = async(req, res) => {
@@ -43,4 +45,56 @@ const addBudget = async(req, res) => {
     }
 };
 
-module.exports = { addBudget };
+
+const getBudgetStatus = async (req, res) => {
+    try {
+        const userId = req.user.id; 
+      // for Currently month and year
+        const month = new Date().getMonth() +1;
+        const year = new Date().getFullYear();
+     // to get budget
+        const budget = await Budget.findOne({ user : userId, month, year });
+
+        if (!budget) {
+            return res.status(404).json({ message : "NO budget set" });
+        }
+        // calculate the total expenses
+            const expenses = await Expense.aggregate([
+                {
+                    $match: {
+                        user: budget.user,
+                        createdAt: {
+                            $gte: new Date(year, month -1, 1),
+                            $lte: new Date(year, month, 0),
+                        },
+                    },
+                }, 
+                {
+                    $group: {
+                        _id: null,
+                        total: { $sum: "$amount" },
+                    },
+                },
+            ]);
+        // for totalSpent if no expenses it will Be 0
+            const totalSpent = expenses[0]?.total || 0;
+        // calculate the remainder
+            const remaining = budget.amount - totalSpent;
+        // calculate the percentage %
+            const percentage = (totalSpent / budget.amount ) * 100;
+            
+            res.json({
+                budget: budget.amount,
+                totalSpent,
+                remaining,
+                percentage: percentage.toFixed(2),
+                alert: budget.alertSent,
+            });
+        } catch (error) {
+            res.status(500).json({ message : "Server Error" });
+        }
+    };
+
+
+
+module.exports = { addBudget, getBudgetStatus };

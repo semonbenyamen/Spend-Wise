@@ -5,7 +5,7 @@ const router = express.Router();
 const { expenseValidation } = require('../Middlewares/validator');
 
 
-const { addExpense, getExpenses, deleteExpense, updateExpense} = require("../Controllers/expenseController");
+const { addExpense, getExpenses, deleteExpense, updateExpense, getMonthlyReport} = require("../Controllers/expenseController");
 // حماية الروتات دي عشان بس المستخدمين المسجلين يقدروا يوصلوا لها
 const protect  = require("../Middlewares/authMiddleware"); 
 
@@ -14,6 +14,7 @@ router.post("/add", protect, expenseValidation, addExpense);
 router.get("/all", protect, getExpenses);
 router.delete("/delete/:id", protect, deleteExpense);
 router.put("/update/:id", protect, updateExpense);
+router.get("/monthly-report", protect, getMonthlyReport);
 
 
 module.exports = router;

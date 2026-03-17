@@ -149,5 +149,76 @@ const updateExpense = async (req, res) => {
     }
 };
 
-module.exports = { addExpense, getExpenses, deleteExpense, updateExpense, };
+// Features Dashboard Category
+
+const getExpensesByCategory = async (req, res) => {
+    try {
+        const userId = req.user.id;
+        const data = await Expense.aggregate([
+            {
+                $match: { user: userId },
+            },
+            {
+                $group: {
+                    _id: "$category",
+                    total: { $sum: "$amount" },
+                },
+            },
+        ]);
+        res.status(200).json({
+            success : true,
+            data,
+        });
+
+    } catch (error) {
+        res.status(200).json({
+            success: true,
+            data,
+        });
+    }
+};
+
+// Features Monthly Reports
+const getMonthlyReport = async (req, res) => {
+    try {
+        const userId = req.user.id;
+        const data = await Expense.aggregate([
+            {
+                // User expenses
+                $match: { user: userId },
+            },
+            {
+                // add month by date
+               $addFields: {
+                month: { $month: "$createdAt" },
+                
+            },
+        },
+        {
+            $group: {
+                _id: "$month",
+                total: { $sum: "$amount" },
+            },
+        },
+        {
+            // ترتيب
+            $sort: { _id: 1 },
+        },
+        ]);
+
+        res.status(200).json({
+            success: true,
+            data,
+        });
+
+    } catch (error) {
+        res.status(500).json ({
+            success : false,
+            message: error.message,
+        });
+    }
+    
+};
+
+module.exports = { addExpense, getExpenses, deleteExpense, updateExpense, getExpensesByCategory, getMonthlyReport };
 
