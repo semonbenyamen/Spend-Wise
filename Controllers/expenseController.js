@@ -1,5 +1,6 @@
 const Expense = require("../Models/Expense");
-
+const mongoose = require("mongoose");
+const Budget = require("../Models/Budget")
 // إضافة مصروف جديد
 const addExpense = async (req, res) => {
     try {
@@ -13,9 +14,54 @@ const addExpense = async (req, res) => {
             user: req.user.id 
         });
 
+// Expense By Aggregate
+// get this is month and year (Current)
+const month = new Date().getMonth() +1;
+const year = new Date().getFullYear();
+
+// Calculate total expenses for the current month
+const totalSpentAggregate = await Expense.aggregate([
+// Filter for expenses and makesure the expenses is current month only
+    { $match: {
+        user: new mongoose.Types.ObjectId(req.user.id),
+        createdAt: {
+            $gte: new Date(year, month-1,1),
+            $lt: new Date(year, month, 1)
+        }
+    }},
+    // $group : to get all data/_id: null: to get all expenses
+    { $group: { _id: null, total: { $sum: "$amount" }}}
+]);
+
+// If there expenses get the total If no expenses give 0
+const totalSpent = totalSpentAggregate[0]?.total || 0;
+
+
+//Alert System
+
+const budget = await Budget.findOne({ user: req.user.id, month, year });
+
+if (!budget) return res.status(400).json({ msg : "No budget set for this month"});
+
+let alertMessage = null;
+// for alert of 100% 
+// !== to not sent the same notification more than once
+if (totalSpent >= budget.amount && budget.alertSent !== "max") {
+    alertMessage = "You have reached 100% of your monthly budget!";
+    budget.alertSent = "Max";
+    await budget.save();
+// for alert of 80%    
+} else if ( totalSpent >= budget.amount * 0.8 && budget.alertSent === "none") {
+    alertMessage = " Warning! You have spent 80% of your monthly budget.";
+    budget.alertSent = "Warning";
+    await budget.save();
+}
+
+
         res.status(201).json({
             success: true,
-            data: Expense
+            message: alertMessage,
+            data: expense
         });
         
     } catch (error) {
@@ -25,6 +71,12 @@ const addExpense = async (req, res) => {
         });
     }
 };
+
+
+
+
+
+
 
 // عرض كل مصاريف المستخدم الحالي
 const getExpenses = async (req, res) => {
@@ -96,30 +148,6 @@ const updateExpense = async (req, res) => {
         res.status(500).json({ success: false, msg: "Server Error" });
     }
 };
-
-// const getTotalExpenses = async(req, res) => {
-//     try {
-//         const result = await Expense.aggregate([
-//             {
-//                 // Take only the current user's expenses
-//                 $match : { user : req.user.id }
-//             },
-//             {
-//                 // add all amount 
-//                 $group : {
-//                     _id : null,
-//                     total : { $sum : "$amount" }
-//                 }
-//             }
-//         ]);
-//         res.status(200).json({
-//             seccess : true,
-//             total : result[0]?.total || 0
-//         });
-//     } catch (err) {
-//         res.status(500).json({ msg : err.message});
-//     }
-// }
 
 module.exports = { addExpense, getExpenses, deleteExpense, updateExpense, };
 

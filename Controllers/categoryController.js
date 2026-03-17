@@ -10,7 +10,7 @@ const createCategory = async (req, res)=> {
             user: req.user.id
         });
         res.status(201).json({
-            seccess: true,
+            success: true,
             data: category
         });
     } catch (error) {
