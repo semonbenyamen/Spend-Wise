@@ -23,10 +23,8 @@ connectDB();
 app.use("/api/auth", require("./routes/authRoutes"));
 app.use("/api/categories", require("./routes/categoryRoutes"));
 app.use("/api/expenses", require("./routes/expenseRoutes"));
-
-
-//
 app.use("/api/budget", require("./routes/budgetRoutes"));
+app.use("/api/admin", require("./routes/adminRoutes"));
 
 app.get("/", (req, res) => {
   res.send("API is running...");
