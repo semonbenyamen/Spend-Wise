@@ -2,13 +2,12 @@ const express =require('express');
 const router = express.Router();
 
 const {registerUser, loginUser, getUserProfile} = require("../Controllers/authController");
+const {registerValidation, loginValidation } = require("../Middlewares/validator");
 
 // Register route
-router.post("/register", registerUser);
-
+router.post("/register",registerValidation, registerUser);
 // Login route
-router.post("/login", loginUser);
-
+router.post("/login", loginValidation, loginUser);
 
 // Middleware 
 const protect = require("../Middlewares/authMiddleware");

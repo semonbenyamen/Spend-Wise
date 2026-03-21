@@ -27,7 +27,7 @@ const getCategories = async (req, res, next) => {
             count: categories.length,
             data: categories
         });
-    } catch(err) {
+    } catch(error) {
         next(error);
     }
 };
@@ -58,7 +58,7 @@ const deleteCategory = async (req, res, next) => {
             msg : "Category deleted"
         });
 
-    } catch (err) {
+    } catch (error) {
         next(error);
     }
 };
@@ -84,7 +84,7 @@ const updateCategory = async (req, res, next) => {
             success : true,
             data : category
         });
-    } catch (err) {
+    } catch (error) {
         next(error);
     }
 };

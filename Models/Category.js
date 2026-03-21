@@ -11,8 +11,8 @@ const categorySchema = new mongoose.Schema({
     user: {
         type : mongoose.Schema.Types.ObjectId,
         ref: "User",
-        reqired: true
+        required: true
     },
-}, { timestamp: true });
+}, { timestamps: true });
 
 module.exports = mongoose.model("Category", categorySchema);

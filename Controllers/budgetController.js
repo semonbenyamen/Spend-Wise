@@ -37,7 +37,7 @@ const addBudget = async(req, res, next) => {
             data : budget
         });
 
-    } catch (err) {
+    } catch (error) {
        next(error);
     }
 };

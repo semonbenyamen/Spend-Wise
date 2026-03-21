@@ -1,6 +1,6 @@
 const Expense = require("../Models/Expense");
 const mongoose = require("mongoose");
-const Budget = require("../Models/Budget")
+const Budget = require("../Models/Budget");
 // إضافة مصروف جديد
 const addExpense = async (req, res, next) => {
     try {
@@ -48,15 +48,17 @@ let alertMessage = null;
 // !== to not sent the same notification more than once
 if (totalSpent >= budget.amount && budget.alertSent !== "max") {
     alertMessage = "You have reached 100% of your monthly budget!";
-    budget.alertSent = "Max";
+    budget.alertSent = "max";
     await budget.save();
 // for alert of 80%    
 } else if ( totalSpent >= budget.amount * 0.8 && budget.alertSent === "none") {
     alertMessage = " Warning! You have spent 80% of your monthly budget.";
-    budget.alertSent = "Warning";
+    budget.alertSent = "warning";
     await budget.save();
-}
 
+} else if (totalSpent > budget.amount){
+    alertMessage = "You already exceeded your monthly budged";
+}
 
         res.status(201).json({
             success: true,
@@ -153,7 +155,9 @@ const getExpensesByCategory = async (req, res, next) => {
         const userId = req.user.id;
         const data = await Expense.aggregate([
             {
-                $match: { user: userId },
+                $match: { 
+                    user: new mongoose.Types.ObjectId(userId)
+                 },
             },
             {
                 $group: {
@@ -179,7 +183,9 @@ const getMonthlyReport = async (req, res, next) => {
         const data = await Expense.aggregate([
             {
                 // User expenses
-                $match: { user: userId },
+                $match: {
+                     user: new mongoose.Types.ObjectId(userId) 
+                    },
             },
             {
                 // add month by date
