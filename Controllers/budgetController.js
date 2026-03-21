@@ -1,9 +1,9 @@
 const Budget = require("../Models/Budget");
 const Expense = require("../Models/Expense");
-const Exppense = require("../Models/Expense");
+
 
 //Setting a monthly budget
-const addBudget = async(req, res) => {
+const addBudget = async(req, res, next) => {
     try {
         // take amount from user
         const { amount } = req.body;
@@ -38,15 +38,12 @@ const addBudget = async(req, res) => {
         });
 
     } catch (err) {
-        res.status(500).json({
-            success : false,
-            message : err.message
-        });
+       next(error);
     }
 };
 
 
-const getBudgetStatus = async (req, res) => {
+const getBudgetStatus = async (req, res, next) => {
     try {
         const userId = req.user.id; 
       // for Currently month and year
@@ -91,7 +88,7 @@ const getBudgetStatus = async (req, res) => {
                 alert: budget.alertSent,
             });
         } catch (error) {
-            res.status(500).json({ message : "Server Error" });
+            next(error);
         }
     };
 

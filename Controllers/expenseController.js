@@ -2,7 +2,7 @@ const Expense = require("../Models/Expense");
 const mongoose = require("mongoose");
 const Budget = require("../Models/Budget")
 // إضافة مصروف جديد
-const addExpense = async (req, res) => {
+const addExpense = async (req, res, next) => {
     try {
         const { title, amount, category } = req.body;
 
@@ -65,10 +65,7 @@ if (totalSpent >= budget.amount && budget.alertSent !== "max") {
         });
         
     } catch (error) {
-        res.status(400).json({
-            success: false,
-            message: error.message
-        });
+        next(error);
     }
 };
 
@@ -79,7 +76,7 @@ if (totalSpent >= budget.amount && budget.alertSent !== "max") {
 
 
 // عرض كل مصاريف المستخدم الحالي
-const getExpenses = async (req, res) => {
+const getExpenses = async (req, res, next) => {
     try {
         // بنبحث عن المصاريف اللي الـ user ID بتاعها بيساوي ID الشخص اللي عامل login
         const expenses = await Expense.find({ user: req.user.id })
@@ -93,12 +90,12 @@ const getExpenses = async (req, res) => {
             data: expenses
         });
     } catch (error) {
-        res.status(500).json({ success: false, message: "Server Error" });
+        next(error);
     }
 };
 
 // مسح مصروف معين
-const deleteExpense = async (req, res) => {
+const deleteExpense = async (req, res, next) => {
     try {
         // 1. البحث عن المصروف بالـ ID المبعوث في الرابط
         const expense = await Expense.findById(req.params.id);
@@ -115,14 +112,14 @@ const deleteExpense = async (req, res) => {
         await expense.deleteOne();
         res.json({ success: true, msg: "The expense was successfully cleared" });
     } catch (error) {
-        res.status(500).json({ success: false, msg: "Server Error" });
+        next(error);
     }
 };
 
 
 
 // تعديل مصروف معين
-const updateExpense = async (req, res) => {
+const updateExpense = async (req, res, next) => {
     try {
         let expense = await Expense.findById(req.params.id);
 
@@ -145,13 +142,13 @@ const updateExpense = async (req, res) => {
 
         res.json({ success: true, data: expense });
     } catch (error) {
-        res.status(500).json({ success: false, msg: "Server Error" });
+        next(error);
     }
 };
 
 // Features Dashboard Category
 
-const getExpensesByCategory = async (req, res) => {
+const getExpensesByCategory = async (req, res, next) => {
     try {
         const userId = req.user.id;
         const data = await Expense.aggregate([
@@ -171,15 +168,12 @@ const getExpensesByCategory = async (req, res) => {
         });
 
     } catch (error) {
-        res.status(200).json({
-            success: true,
-            data,
-        });
+        next(error);
     }
 };
 
 // Features Monthly Reports
-const getMonthlyReport = async (req, res) => {
+const getMonthlyReport = async (req, res, next) => {
     try {
         const userId = req.user.id;
         const data = await Expense.aggregate([
@@ -212,10 +206,7 @@ const getMonthlyReport = async (req, res) => {
         });
 
     } catch (error) {
-        res.status(500).json ({
-            success : false,
-            message: error.message,
-        });
+        next(error);
     }
     
 };

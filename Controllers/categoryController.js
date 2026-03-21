@@ -1,7 +1,7 @@
 const Category = require ("../Models/Category");
 const Expense = require("../Models/Expense")
 
-const createCategory = async (req, res)=> {
+const createCategory = async (req, res, next)=> {
     try {
     //take name from body
         const {name} = req.body;    
@@ -14,11 +14,11 @@ const createCategory = async (req, res)=> {
             data: category
         });
     } catch (error) {
-        res.status(500).json({ msg : `Sever error ${error.message}`});
+        next(error);
     }
 };
 
-const getCategories = async (req, res) => {
+const getCategories = async (req, res, next) => {
     try {
     // search for category by user id
         const categories = await Category.find({user : req.user.id});
@@ -28,11 +28,11 @@ const getCategories = async (req, res) => {
             data: categories
         });
     } catch(err) {
-        res.status(500).json({ msg : `Sever error ${err.message}`});
+        next(error);
     }
 };
 
-const deleteCategory = async (req, res) => {
+const deleteCategory = async (req, res, next) => {
     try {
     // search about category by ID    
         const category = await Category.findById(req.params.id);
@@ -59,12 +59,12 @@ const deleteCategory = async (req, res) => {
         });
 
     } catch (err) {
-        res.status(500).json({ msg :`Sever error ${err.message}`});
+        next(error);
     }
 };
 
 
-const updateCategory = async (req, res) => {
+const updateCategory = async (req, res, next) => {
     try {
         const category = await Category.findById(req.params.id);
 
@@ -85,7 +85,7 @@ const updateCategory = async (req, res) => {
             data : category
         });
     } catch (err) {
-        res.status(500).json({ msg : `Sever error ${err.message}`});
+        next(error);
     }
 };
 

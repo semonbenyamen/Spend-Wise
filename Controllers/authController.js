@@ -3,7 +3,7 @@ const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 
 // 1: تسجيل مستخدم جديد
-const registerUser = async (req, res) => {
+const registerUser = async (req, res, next) => {
   try {
     const { name, email, password } = req.body;
     if (!name || !email || !password) return res.status(400).json({ msg: "All fields required" });
@@ -23,12 +23,12 @@ const registerUser = async (req, res) => {
   }
 });
   } catch (error) {
-    res.status(500).json({ msg: "Server Error" });
+    next(error);
   }
 };
 
 // 2: تسجيل الدخول للمستخدم
-const loginUser = async (req, res) => {
+const loginUser = async (req, res, next) => {
   try {
     const { email, password } = req.body;
     const user = await User.findOne({ email });
@@ -46,14 +46,14 @@ const loginUser = async (req, res) => {
 
     res.status(200).json({ msg: "Login successful", token });
   } catch (error) {
-    res.status(500).json({ msg: "Server Error" });
+    next(error);
   }
 };
 
 
 
 // عرض بيانات الملف الشخصي للمستخدم 
-const getUserProfile = async (req, res) => {
+const getUserProfile = async (req, res, next) => {
     try {
         const user = await User.findById(req.user.id).select("-password");
         
@@ -68,7 +68,7 @@ const getUserProfile = async (req, res) => {
             res.status(404).json({ msg: "User not found" });
         }
     } catch (error) {
-        res.status(500).json({ msg: "Server Error" });
+        next(error);
     }
 };
 

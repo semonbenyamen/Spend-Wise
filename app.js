@@ -32,6 +32,8 @@ app.get("/", (req, res) => {
 
 const PORT = process.env.PORT || 3000;
 
+const errorMiddleware = require("./Middlewares/errorMiddleware");
+app.use(errorMiddleware);
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });

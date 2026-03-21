@@ -1,7 +1,7 @@
 const User = require("../Models/User"); 
 const Expense = require("../Models/Expense");
 
-const getAllUsers = async(req, res) => {
+const getAllUsers = async(req, res, next) => {
     try {
         const users = await User.find().select("-password");
 
@@ -11,15 +11,12 @@ const getAllUsers = async(req, res) => {
             data: users
         });
     } catch (error) {
-        res.status(500).json({
-            success: false,
-            message: error.message
-        });
+      next(error);
     }
 };
 
 
-const getAllExpenses = async(req, res) => {
+const getAllExpenses = async(req, res, next) => {
     try {
         const expenses = await Expense.find()
         // get user is data not ID
@@ -34,14 +31,11 @@ const getAllExpenses = async(req, res) => {
         });
 
     } catch (error) {
-        res.status(500).json({
-            success: false,
-            message: error.message
-        });
+       next(error);
     }
 };
 
-const getSystemAnalytics = async(req,res) => {
+const getSystemAnalytics = async(req,res, next) => {
     try {
         // Total expenses
         const totalExpenses = await Expense.aggregate([
@@ -131,10 +125,7 @@ const getSystemAnalytics = async(req,res) => {
         });
 
     } catch (error) {
-        res.status(500).json({
-            success: false,
-            msg: error.message
-        });
+        next(error);
     }
 }
 
