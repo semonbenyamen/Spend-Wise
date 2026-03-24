@@ -73,4 +73,36 @@ const getUserProfile = async (req, res, next) => {
 };
 
 
-module.exports = { registerUser, loginUser, getUserProfile };
+const updateProfile = async (req, res, next) => {
+  try {
+    const user = await User.findById(req.user.id);
+
+    if(!user) {
+      return res.status(404).json({ msg: "User not found" });
+    }
+    // Update name and email if available
+    if (req.body.name) user.name = req.body.name;
+    if (req.body.email) user.email = req.body.email;
+
+    // Update image if available
+    if (req.file) {
+      user.profileImage = req.file.filename;
+    }
+     await user.save();
+        res.status(200).json({
+          success: true,
+          data: {
+            _id: user._id,
+            name: user.name,
+            email: user.email,
+            role: user.role,
+            profileImage: user.profileImage
+          }
+        });
+  } catch (error) {
+    next(error);
+  }
+};
+
+
+module.exports = { registerUser, loginUser, getUserProfile, updateProfile };

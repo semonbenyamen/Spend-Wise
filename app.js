@@ -1,12 +1,18 @@
 require("dotenv").config();
 const express = require("express");
 const mongoose = require('mongoose');
-
+// for front end
+const cors = require("cors");
+const path = require("path");
 const app = express();
+
+// for front end
+app.use(cors());
+
 //middlewares
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-
+app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 // connect database
 const connectDB = async () => {
   try {
@@ -34,6 +40,7 @@ const PORT = process.env.PORT || 3000;
 
 const errorMiddleware = require("./Middlewares/errorMiddleware");
 app.use(errorMiddleware);
+
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });
