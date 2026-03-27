@@ -5,8 +5,9 @@ const mongoose = require('mongoose');
 const cors = require("cors");
 const path = require("path");
 const app = express();
-
-// for front end
+// for deploy for photo
+app.set("trust proxy", 1);
+// for front end 
 app.use(cors());
 
 //middlewares

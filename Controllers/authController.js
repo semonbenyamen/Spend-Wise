@@ -1,6 +1,8 @@
 const User = require("../Models/User");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
+// for Image
+const generateImageUrl = require("../utils/generateImageUrl");
 
 // 1: تسجيل مستخدم جديد
 const registerUser = async (req, res, next) => {
@@ -58,11 +60,15 @@ const getUserProfile = async (req, res, next) => {
         const user = await User.findById(req.user.id).select("-password");
         
         if (user) {
+          const baseUrl = `${req.protocol}://${req.get("host")}`;
             res.json({
                 success: true,
                 _id: user._id,
                 name: user.name,
-                email: user.email
+                email: user.email,
+                profileImage: user.profileImage
+                ? `${baseUrl}/uploads/${user.profileImage}`
+                : null
             });
         } else {
             res.status(404).json({ msg: "User not found" });
@@ -72,7 +78,7 @@ const getUserProfile = async (req, res, next) => {
     }
 };
 
-
+// updateProfile
 const updateProfile = async (req, res, next) => {
   try {
     const user = await User.findById(req.user.id);
@@ -89,6 +95,7 @@ const updateProfile = async (req, res, next) => {
       user.profileImage = req.file.filename;
     }
      await user.save();
+
         res.status(200).json({
           success: true,
           data: {
@@ -96,7 +103,8 @@ const updateProfile = async (req, res, next) => {
             name: user.name,
             email: user.email,
             role: user.role,
-            profileImage: user.profileImage
+          // to back URL for image  
+            profileImage: generateImageUrl(req, user.profileImage)
           }
         });
   } catch (error) {
