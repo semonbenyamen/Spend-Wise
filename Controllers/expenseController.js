@@ -6,7 +6,7 @@ const addExpense = async (req, res, next) => {
     try {
         const { title, amount, category } = req.body;
 
-        // ملاحظة: الـ req.user.id بتيجي من الـ Auth Middleware اللي هنعمله
+        // req.user.id بتيجي من الـ Auth Middleware 
         const expense = await Expense.create({
             title,
             amount,
